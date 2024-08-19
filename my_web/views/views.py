@@ -29,7 +29,9 @@ class CustomerListView(View):
     def get(self, request):
         search = request.GET.get('search')
         filter_date = request.GET.get('filter', '')
-        customers = Customer.objects.all()
+        customers = Customer.objects.raw('''select * from customer;''')
+        for customer in customers:
+            print(customer.full_name, customer.email)
         if search:
             customers = customers.filter(Q(full_name__icontains=search) | Q(email__icontains=search))
         if filter_date == 'filter_date':
@@ -49,6 +51,7 @@ class CustomerDetailView(View):
         print(args)
         print(kwargs)
         customer = Customer.objects.get(slug=customer_slug)
+        # customer = Customer.objects.raw('''select * from customer where slug=%s''', [customer_slug])
         context = {'customer': customer}
         return render(request, 'my_web/customer-details.html', context)
 

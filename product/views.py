@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.views import View
+from django.views.generic import ListView,CreateView
 
 from product.models import Product
 
@@ -31,6 +32,7 @@ class ProductListView(View):
         return render(request, 'product/product-list.html', context)
 
 
+# ListView , CreateView, DeleteView, UpdateView
 
 
 # git push -f origin master
