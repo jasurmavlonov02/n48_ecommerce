@@ -1,5 +1,6 @@
 from django import forms
 from users.models import User
+from users.custom_field import MultiEmailField
 
 
 class LoginForm(forms.Form):
@@ -39,3 +40,9 @@ class RegisterModelForm(forms.ModelForm):
             user.save()
 
         return user
+
+
+class SendingEmailForm(forms.Form):
+    subject = forms.CharField(max_length=100)
+    message = forms.CharField(widget=forms.Textarea)
+    recipient_list = MultiEmailField(widget=forms.Textarea)
