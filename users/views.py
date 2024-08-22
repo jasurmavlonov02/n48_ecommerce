@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 
+from config.settings import EMAIL_DEFAULT_SENDER
 from users.forms import LoginForm, RegisterModelForm
 
 
@@ -28,6 +30,14 @@ def register_page(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
+            send_mail(
+                'User Succesfully Registered',
+                'Test body',
+                EMAIL_DEFAULT_SENDER,
+                [user.email],
+                fail_silently=False
+
+            )
             login(request, user)
             return redirect('customers')
     else:
@@ -35,6 +45,7 @@ def register_page(request):
     context = {'form': form}
     return render(request, 'my_web/auth/register.html', context)
 
+# FormView
 
 def logout_page(request):
     if request.method == 'POST':
