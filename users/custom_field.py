@@ -16,3 +16,4 @@ class MultiEmailField(forms.Field):
         super().validate(value)
         for email in value:
             validate_email(email)
+
