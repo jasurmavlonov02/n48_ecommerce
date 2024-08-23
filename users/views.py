@@ -80,7 +80,7 @@ class RegisterPage(FormView):
             fail_silently=False
 
         )
-        login(self.request, user)
+        login(self.request, user,backend='django.contrib.auth.backends.ModelBackend')
         return super().form_valid(form)
 
 

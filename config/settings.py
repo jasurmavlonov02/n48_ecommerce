@@ -48,7 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'my_web.apps.MyWebConfig',
     'users.apps.UsersConfig',
-    'product.apps.ProductConfig'
+    'product.apps.ProductConfig',
+    'social_django',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -151,8 +153,6 @@ JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 
 AUTH_USER_MODEL = 'users.User'
 
-
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -161,5 +161,12 @@ EMAIL_HOST_USER = 'jm1495046@gmail.com'
 EMAIL_HOST_PASSWORD = 'icyr klts basq srid'
 EMAIL_DEFAULT_SENDER = EMAIL_HOST_USER
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'social_core.backends.google.GoogleOAuth2'
+]
 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '386670267992-2tea2p1jhdfrck7d0gp8ohfqda37sfad.apps.googleusercontent.com'  # Google Client ID
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'  # Google Client Secret
 
+LOGIN_REDIRECT_URL = 'customers'
