@@ -1,3 +1,6 @@
+import csv
+import datetime
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.views import View
@@ -29,7 +32,7 @@ class CustomerListView(View):
     def get(self, request):
         search = request.GET.get('search')
         filter_date = request.GET.get('filter', '')
-        customers = Customer.objects.raw('''select * from customer;''')
+        customers = Customer.objects.all()
         for customer in customers:
             print(customer.full_name, customer.email)
         if search:
@@ -128,3 +131,28 @@ class CustomerDeleteView(View):
         if customer:
             customer.delete()
             return redirect('customers')
+
+
+def export_data(request):
+    format = request.GET.get('format')
+    if format == 'csv':
+        meta = Customer._meta
+        field_names = [field.name for field in meta.fields]
+        response = HttpResponse(content_type='text/csv')
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.csv'
+        writer = csv.writer(response)
+        writer.writerow(field_names)
+        for obj in Customer.objects.all():
+            writer.writerow([getattr(obj, field) for field in field_names])
+
+
+    elif format == 'json':
+        response = None
+
+
+    elif format == 'xlsx':
+        response = None
+
+
+    return response

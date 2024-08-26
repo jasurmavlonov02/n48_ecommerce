@@ -13,6 +13,7 @@ urlpatterns = [
     path('edit-customer/<slug:customer_slug>/', views.CustomerUpdateView.as_view(), name='edit_customer'),
     path('delete-customer/<slug:customer_slug>/', views.CustomerDeleteView.as_view(), name='delete_customer'),
 
-    #     Authentication
+    #     export-data
+    path('customers/export-data/', views.export_data, name='export_data')
 
 ]
