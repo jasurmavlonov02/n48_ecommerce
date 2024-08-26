@@ -1,5 +1,6 @@
 import csv
 import datetime
+import json
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
@@ -134,12 +135,13 @@ class CustomerDeleteView(View):
 
 
 def export_data(request):
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
     format = request.GET.get('format')
     if format == 'csv':
         meta = Customer._meta
         field_names = [field.name for field in meta.fields]
         response = HttpResponse(content_type='text/csv')
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
+
         response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.csv'
         writer = csv.writer(response)
         writer.writerow(field_names)
@@ -148,11 +150,19 @@ def export_data(request):
 
 
     elif format == 'json':
-        response = None
+        response = HttpResponse(content_type='application/json')
+        data = list(Customer.objects.all().values('id','full_name','phone','email'))
+        response.write(json.dumps(data, indent=4))
+        response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.json'
+
+
 
 
     elif format == 'xlsx':
-        response = None
+        pass
 
+    else:
+        response = HttpResponse(status=404)
+        response.content = 'Bad Request'
 
     return response
