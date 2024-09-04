@@ -14,6 +14,6 @@ urlpatterns = [
     path('delete-customer/<slug:customer_slug>/', views.CustomerDeleteView.as_view(), name='delete_customer'),
 
     #     export-data
-    path('customers/export-data/', views.export_data, name='export_data')
+    path('customers/export-data/', views.ExportData.as_view(), name='export_data')
 
 ]

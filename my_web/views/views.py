@@ -1,6 +1,7 @@
 import csv
 import datetime
 import json
+import openpyxl
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
@@ -34,8 +35,7 @@ class CustomerListView(View):
         search = request.GET.get('search')
         filter_date = request.GET.get('filter', '')
         customers = Customer.objects.all()
-        for customer in customers:
-            print(customer.full_name, customer.email)
+
         if search:
             customers = customers.filter(Q(full_name__icontains=search) | Q(email__icontains=search))
         if filter_date == 'filter_date':
@@ -52,8 +52,7 @@ class CustomerListView(View):
 class CustomerDetailView(View):
     def get(self, request, *args, **kwargs):
         customer_slug = kwargs['customer_slug']
-        print(args)
-        print(kwargs)
+
         customer = Customer.objects.get(slug=customer_slug)
         # customer = Customer.objects.raw('''select * from customer where slug=%s''', [customer_slug])
         context = {'customer': customer}
@@ -151,18 +150,83 @@ def export_data(request):
 
     elif format == 'json':
         response = HttpResponse(content_type='application/json')
-        data = list(Customer.objects.all().values('id','full_name','phone','email'))
-        response.write(json.dumps(data, indent=4))
+        data = list(Customer.objects.all())
+        response.write(json.dumps(data, indent=4, default=str))
         response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.json'
 
 
 
 
     elif format == 'xlsx':
-        pass
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename="{Customer._meta.object_name}-{date}.xlsx"'
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        worksheet.title = 'Customers'
+        header = ['ID', 'Full Name', 'Email', 'Addres', 'Slug', 'Phone Number']
+
+        worksheet.append(header)
+        customers = Customer.objects.all()
+        for obj in customers:
+            worksheet.append([obj.id, obj.full_name, obj.email, obj.address, obj.slug, obj.phone])
+
+        workbook.save(response)
+        return response
+
+    # header
 
     else:
         response = HttpResponse(status=404)
         response.content = 'Bad Request'
 
     return response
+
+
+class ExportData(View):
+    def get(self, request):
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        format = request.GET.get('format')
+        if format == 'csv':
+            meta = Customer._meta
+            field_names = [field.name for field in meta.fields]
+            response = HttpResponse(content_type='text/csv')
+
+            response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.csv'
+            writer = csv.writer(response)
+            writer.writerow(field_names)
+            for obj in Customer.objects.all():
+                writer.writerow([getattr(obj, field) for field in field_names])
+
+
+        elif format == 'json':
+            response = HttpResponse(content_type='application/json')
+            data = list(Customer.objects.all())
+            response.write(json.dumps(data, indent=4, default=str))
+            response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.json'
+
+
+
+
+        elif format == 'xlsx':
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{Customer._meta.object_name}-{date}.xlsx"'
+            workbook = openpyxl.Workbook()
+            worksheet = workbook.active
+            worksheet.title = 'Customers'
+            header = ['ID', 'Full Name', 'Email', 'Addres', 'Slug', 'Phone Number']
+
+            worksheet.append(header)
+            customers = Customer.objects.all()
+            for obj in customers:
+                worksheet.append([obj.id, obj.full_name, obj.email, obj.address, obj.slug, obj.phone])
+
+            workbook.save(response)
+            return response
+
+        # header
+
+        else:
+            response = HttpResponse(status=404)
+            response.content = 'Bad Request'
+
+        return response

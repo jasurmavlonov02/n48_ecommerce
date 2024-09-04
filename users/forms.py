@@ -32,7 +32,7 @@ class RegisterModelForm(forms.ModelForm):
     def save(self, commit=True):
         user = super(RegisterModelForm, self).save(commit=False)
         user.set_password(self.cleaned_data['password'])
-        user.is_active = True
+        user.is_active = False
         user.is_superuser = True
         user.is_staff = True
 
