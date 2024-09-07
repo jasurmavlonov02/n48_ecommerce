@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'product.apps.ProductConfig',
     'social_django',
     'import_export',
+    'app.apps.AppConfig',
 ]
 
 MIDDLEWARE = [
@@ -171,6 +172,4 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'  # Goog
 
 LOGIN_REDIRECT_URL = 'customers'
 
-
 # CORS Header
-
