@@ -5,9 +5,11 @@
     <title>App</title>
 </head>
 <body>
-{% for book in books %}
-    <h1>Max Price Books => {{ book.min_price }}<h1>
+{% for author in authors %}
+    <h1>{{ author.name }} => {{ author.most_popular_book }}</h1>
 {% endfor %}
-
+{#{% for book in books %}#}
+{#    <h1>{{ book.author__name }} => {{ book.book_count }}</h1>#}
+{#{% endfor %}#}
 </body>
 </html>
